@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+//for talking scene
+
+
 public class HeroMove : MonoBehaviour
 {
     private Vector2 startPos;

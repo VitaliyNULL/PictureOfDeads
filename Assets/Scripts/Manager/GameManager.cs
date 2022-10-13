@@ -121,7 +121,10 @@ public class GameManager : MonoBehaviour
         //     DialogueManager.GetInstance().EnterDialogueMode(firstScene);
         // }
     }
-
+    
+    
+    
+   
     public void ShowCurrentItemInfo(IconIndexNum iconIndexNum)
     {
         showInfoUI.SetActive(true);
@@ -151,6 +154,10 @@ public class GameManager : MonoBehaviour
     {
         showInfoUI.SetActive(false);
     }
+    
+    
+    //<><><><><><><><><><><><><><><><><><><>
+    // this code can be simplified to 2 methods
 
     public void ShowItemHere()
     {
@@ -194,6 +201,8 @@ public class GameManager : MonoBehaviour
     {
         bottomTextInfo.gameObject.LeanMoveY(-Screen.height, 0.5f).setEaseInExpo().delay = 0.1f;
     }
+    
+    //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     IEnumerator VisibleSprite(string scene)
     {

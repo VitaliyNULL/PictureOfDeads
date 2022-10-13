@@ -47,6 +47,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    //methods for call sounds
     public void Scary()
     {
         audioSource.PlayOneShot(scary);

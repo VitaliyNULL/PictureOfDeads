@@ -62,16 +62,15 @@ public class PlayerController : MonoBehaviour
         playedRb.velocity = new Vector2(speed, playedRb.velocity.y);
         animator.SetFloat("Speed", Math.Abs(speed));
     }
-    
+
     private void Update()
     {
-      
         if (DialogueManager.GetInstance().dialogueIsPlaying)
         {
             animator.SetFloat("Speed", 0);
             return;
         }
-        
+
         if (calling != null)
         {
             animator.StopPlayback();
@@ -80,7 +79,8 @@ public class PlayerController : MonoBehaviour
 
         itemsToSave = gameManager.inventory.cells;
         itemTypesToSave = gameManager.inventory.item;
-        if(!heroMove.hasStayed){
+        if (!heroMove.hasStayed)
+        {
             if (Input.GetKey(KeyCode.A))
             {
                 speed = -normalSpeed;
@@ -93,243 +93,237 @@ public class PlayerController : MonoBehaviour
             }
             else speed = 0f;
         }
-        if (Input.GetKeyDown(KeyCode.Space) && isItemHere)
-        {
-            Debug.Log(itemsToSave.Length + " Length");
-            for (int i = 0; i < itemsToSave.Length; i++)
-            {
-                if (!itemsToSave[i])
-                {
-                    Debug.Log(i + " is empty");
-                    itemsToSave[i] = true;
-                    itemTypesToSave[i] = foundedItemType;
-                    gameManager.saveInventory.Save(itemsToSave, itemTypesToSave);
-                    Debug.Log(i + " item type is " + foundedItemType);
-                    Debug.Log(i + " cell was filled by " + foundedItem.name);
-                    switch (foundedItemType)
-                    {
-                        case ItemType.Pills:
-                            PlayerPrefs.SetInt("Pills", 1);
-                            break;
-                        case ItemType.Key:
-                            PlayerPrefs.SetInt("Key", 1);
-                            break;
-                        case ItemType.PaintTube:
-                            PlayerPrefs.SetInt("PaintTube", 1);
-                            break;
-                        case ItemType.Bottle:
-                            PlayerPrefs.SetInt("Bottle", 1);
-                            break;
-                        case ItemType.Cigarettes:
-                            PlayerPrefs.SetInt("Cigarettes", 1);
-                            break;
-                    }
 
-                    foundedItem.SetActive(false);
-                    break;
-                }
-                else if (itemsToSave[itemsToSave.Length - 2])
+        // take an items
+        {
+            if (Input.GetKeyDown(KeyCode.Space) && isItemHere)
+            {
+                Debug.Log(itemsToSave.Length + " Length");
+                for (int i = 0; i < itemsToSave.Length; i++)
                 {
-                    Debug.Log("Inventory is full");
-                    break;
-                }
-                else
-                {
-                    Debug.Log(i + " is not empty");
+                    if (!itemsToSave[i])
+                    {
+                        Debug.Log(i + " is empty");
+                        itemsToSave[i] = true;
+                        itemTypesToSave[i] = foundedItemType;
+                        gameManager.saveInventory.Save(itemsToSave, itemTypesToSave);
+                        Debug.Log(i + " item type is " + foundedItemType);
+                        Debug.Log(i + " cell was filled by " + foundedItem.name);
+                        switch (foundedItemType)
+                        {
+                            case ItemType.Pills:
+                                PlayerPrefs.SetInt("Pills", 1);
+                                break;
+                            case ItemType.Key:
+                                PlayerPrefs.SetInt("Key", 1);
+                                break;
+                            case ItemType.PaintTube:
+                                PlayerPrefs.SetInt("PaintTube", 1);
+                                break;
+                            case ItemType.Bottle:
+                                PlayerPrefs.SetInt("Bottle", 1);
+                                break;
+                            case ItemType.Cigarettes:
+                                PlayerPrefs.SetInt("Cigarettes", 1);
+                                break;
+                        }
+
+                        foundedItem.SetActive(false);
+                        break;
+                    }
+                    else if (itemsToSave[itemsToSave.Length - 2])
+                    {
+                        Debug.Log("Inventory is full");
+                        break;
+                    }
+                    else
+                    {
+                        Debug.Log(i + " is not empty");
+                    }
                 }
             }
         }
-
-        if (actManager.actLevel.act == 0)
+        // something for moving on the plot
         {
-            if (actManager.actLevel.task == 0)
+            if (actManager.actLevel.act == 0)
             {
-                if (Input.GetKeyDown(KeyCode.Space) && isPhoneHere)
+                if (actManager.actLevel.task == 0)
                 {
-                    if (PlayerPrefs.GetInt("Phone") != 2)
+                    if (Input.GetKeyDown(KeyCode.Space) && isPhoneHere)
                     {
-                        DialogueManager.GetInstance().EnterDialogueMode(gameManager.zeroScene);
-                        PlayerPrefs.SetInt("Phone", 2);
-                        Debug.Log(PlayerPrefs.GetInt("Phone"));
+                        if (PlayerPrefs.GetInt("Phone") != 2)
+                        {
+                            DialogueManager.GetInstance().EnterDialogueMode(gameManager.zeroScene);
+                            PlayerPrefs.SetInt("Phone", 2);
+                            Debug.Log(PlayerPrefs.GetInt("Phone"));
+                            gameManager.HideInteract();
+                        }
+                    }
+                }
+
+                if (actManager.actLevel.task == 1)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) && isEaselHere && PlayerPrefs.GetInt("PaintTube") == 1)
+                    {
+                        Debug.Log("anusanusKUM");
+                        DialogueManager.GetInstance().EnterDialogueMode(gameManager.firstScene);
                         gameManager.HideInteract();
+                        actManager.actLevel.task = 2;
+                        actManager.actLevelSD.Save(0, 2);
                     }
                 }
-            }
 
-            if (actManager.actLevel.task == 1)
-            {
-                if (Input.GetKeyDown(KeyCode.Space) && isEaselHere && PlayerPrefs.GetInt("PaintTube") == 1)
+                if (actManager.actLevel.task == 2)
                 {
-                    Debug.Log("anusanusKUM");
-                    DialogueManager.GetInstance().EnterDialogueMode(gameManager.firstScene);
-                    gameManager.HideInteract();
-                    actManager.actLevel.task = 2;
-                    actManager.actLevelSD.Save(0, 2);
-                }
-            }
-
-            if (actManager.actLevel.task == 2)
-            {
-                if (Input.GetKeyDown(KeyCode.Space) && isNoteHere)
-                {
-                    Destroy(foundedItem);
-                    PlayerPrefs.SetInt("Notes", PlayerPrefs.GetInt("Notes") + 1);
-                }
-
-                if (PlayerPrefs.GetInt("Notes") == 3)
-                {
-                    isPhoneHere = false;
-                    actManager.actLevel.task = 3;
-                    actManager.actLevelSD.Save(0, 3);
-                }
-            }
-
-            if (actManager.actLevel.task == 3)
-            {
-                if (Input.GetKeyDown(KeyCode.Space) && isPhoneHere)
-                {
-                    if (calling == null)
+                    if (Input.GetKeyDown(KeyCode.Space) && isNoteHere)
                     {
-                        calling = StartCoroutine(Calling());
+                        Destroy(foundedItem);
+                        PlayerPrefs.SetInt("Notes", PlayerPrefs.GetInt("Notes") + 1);
+                    }
+
+                    if (PlayerPrefs.GetInt("Notes") == 3)
+                    {
+                        isPhoneHere = false;
+                        actManager.actLevel.task = 3;
+                        actManager.actLevelSD.Save(0, 3);
+                    }
+                }
+
+                if (actManager.actLevel.task == 3)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) && isPhoneHere)
+                    {
+                        if (calling == null)
+                        {
+                            calling = StartCoroutine(Calling());
+                        }
+                    }
+                }
+
+                if (actManager.actLevel.task == 4)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) && isDoorHere && PlayerPrefs.GetInt("Key") == 1)
+                    {
+                        gameManager.StartVisible("Park");
+                        actManager.actLevel.act = 1;
+                        actManager.actLevel.task = 0;
+                        actManager.actLevelSD.Save(1, 0);
                     }
                 }
             }
 
-            if (actManager.actLevel.task == 4)
+            if (actManager.actLevel.act == 1)
             {
+                if (actManager.actLevel.task == 0)
+                {
+                    if (heroMove.hasStayed && PlayerPrefs.GetInt("FirstPark") != 1)
+                    {
+                        DialogueManager.GetInstance().EnterDialogueMode(gameManager.firstPark);
+                        PlayerPrefs.SetInt("FirstPark", 1);
+                    }
+
+                    if (DialogueManager.GetInstance().dialogIsOver && PlayerPrefs.GetInt("FirstPark") == 1)
+                    {
+                        gameManager.StartVisible("Bar");
+                    }
+                }
+
                 if (Input.GetKeyDown(KeyCode.Space) && isDoorHere && PlayerPrefs.GetInt("Key") == 1)
                 {
                     gameManager.StartVisible("Park");
-                    actManager.actLevel.act = 1;
-                    actManager.actLevel.task = 0;
-                    actManager.actLevelSD.Save(1, 0);
+                }
+
+                if (actManager.actLevel.task == 0)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) && isJannaHere)
+                    {
+                        DialogueManager.GetInstance().EnterDialogueMode(gameManager.thirdScene);
+                        actManager.actLevelSD.Save(1, 1);
+                    }
+                }
+
+
+                if (actManager.actLevel.task == 1)
+                {
+                    if (isRichardHere && PlayerPrefs.GetInt("Richard") != 1)
+                    {
+                        PlayerPrefs.SetInt("Richard", 1);
+                        DialogueManager.GetInstance().EnterDialogueMode(gameManager.fourthScene);
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.Space) && isBarDoorHere)
+                    {
+                        gameManager.StartVisible("Park");
+                    }
+
+                    if (heroMove.hasStayed && PlayerPrefs.GetInt("SecondPark") != 1)
+                    {
+                        DialogueManager.GetInstance().EnterDialogueMode(gameManager.secondPark);
+                        PlayerPrefs.SetInt("SecondPark", 1);
+                        PlayerPrefs.SetInt("RichardAnus", 2);
+                    }
+
+                    if (DialogueManager.GetInstance().dialogIsOver && PlayerPrefs.GetInt("RichardAnus") == 2)
+                    {
+                        gameManager.StartScrimer();
+                    }
+                }
+            }
+
+            if (actManager.actLevel.act == 2)
+            {
+                if (actManager.actLevel.task == 0)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) && isEaselHere)
+                    {
+                        gameManager.HideInteract();
+                        DialogueManager.GetInstance().EnterDialogueMode(gameManager.fifthScene);
+                        gameManager.ShowPressSpace();
+                        actManager.actLevelSD.Save(3, 0);
+                    }
+                }
+            }
+
+            if (actManager.actLevel.act == 3)
+            {
+                if (actManager.actLevel.task == 0)
+                {
+                    if (PlayerPrefs.GetInt("BarLily") != 1 && Input.GetKeyDown(KeyCode.Space) &&
+                        DialogueManager.GetInstance().dialogIsOver)
+                    {
+                        PlayerPrefs.SetInt("BarLily", 1);
+                        SceneManager.LoadScene("BarLily");
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.Space) && isCoatHere)
+                    {
+                        PlayerPrefs.SetInt("Coat", 1);
+                        GameObject.Find("ItemManager").GetComponent<ItemManager>().coat.SetActive(false);
+                        gameManager.HideInteract();
+                        actManager.actLevelSD.Save(3, 1);
+                    }
+                }
+
+                if (actManager.actLevel.task == 1)
+                {
+                    if (Input.GetKeyDown(KeyCode.Space) && isBarDoorHere)
+                    {
+                        gameManager.StartVisible("ValleyLily");
+                    }
+                }
+            }
+
+            if (actManager.actLevel.act == 4)
+            {
+                if (actManager.actLevel.task == 0)
+                {
                 }
             }
         }
-
-        if (actManager.actLevel.act == 1)
-        {
-            if (actManager.actLevel.task == 0)
-            {
-                if (heroMove.hasStayed&& PlayerPrefs.GetInt("FirstPark")!=1)
-                {
-                    DialogueManager.GetInstance().EnterDialogueMode(gameManager.firstPark);
-                    PlayerPrefs.SetInt("FirstPark",1);
-                    
-                }
-                if (DialogueManager.GetInstance().dialogIsOver&&PlayerPrefs.GetInt("FirstPark")==1)
-                {
-                    gameManager.StartVisible("Bar");
-                }
-            }
-            if (Input.GetKeyDown(KeyCode.Space) && isDoorHere && PlayerPrefs.GetInt("Key") == 1)
-            {
-                gameManager.StartVisible("Park");
-            }
-
-            if (actManager.actLevel.task == 0)
-            {
-                if (Input.GetKeyDown(KeyCode.Space) && isJannaHere)
-                {
-                    DialogueManager.GetInstance().EnterDialogueMode(gameManager.thirdScene);
-                    actManager.actLevelSD.Save(1, 1);
-                }
-            }
-
-            
-            if (actManager.actLevel.task == 1)
-            {
-                if (isRichardHere && PlayerPrefs.GetInt("Richard") != 1)
-                {
-                    PlayerPrefs.SetInt("Richard", 1);
-                    DialogueManager.GetInstance().EnterDialogueMode(gameManager.fourthScene);
-                    
-                }
-                if (Input.GetKeyDown(KeyCode.Space) && isBarDoorHere)
-                {                gameManager.StartVisible("Park");
-
-                }
-                if (heroMove.hasStayed&& PlayerPrefs.GetInt("SecondPark")!=1)
-                {
-                    DialogueManager.GetInstance().EnterDialogueMode(gameManager.secondPark);
-                    PlayerPrefs.SetInt("SecondPark",1);
-                    PlayerPrefs.SetInt("RichardAnus",2);
-                    
-                }
-                if (DialogueManager.GetInstance().dialogIsOver&&PlayerPrefs.GetInt("RichardAnus")==2)
-                {
-                    gameManager.StartScrimer();
-
-                }
-            }
-        }
-
-        if (actManager.actLevel.act == 2)
-        {
-            if (actManager.actLevel.task == 0)
-            {
-                
-               
-
-                if (Input.GetKeyDown(KeyCode.Space) && isEaselHere)
-                {
-                    gameManager.HideInteract();
-                    DialogueManager.GetInstance().EnterDialogueMode(gameManager.fifthScene);
-                    gameManager.ShowPressSpace();
-                    actManager.actLevelSD.Save(3, 0);
-                }
-            }
-        }
-
-        if (actManager.actLevel.act == 3)
-        {
-            if (actManager.actLevel.task == 0)
-            {
-                if (PlayerPrefs.GetInt("BarLily") != 1 && Input.GetKeyDown(KeyCode.Space) &&
-                    DialogueManager.GetInstance().dialogIsOver)
-                {
-                    PlayerPrefs.SetInt("BarLily", 1);
-                    SceneManager.LoadScene("BarLily");
-                }
-
-                if (Input.GetKeyDown(KeyCode.Space) && isCoatHere)
-                {
-                    PlayerPrefs.SetInt("Coat", 1);
-                    GameObject.Find("ItemManager").GetComponent<ItemManager>().coat.SetActive(false);
-                    gameManager.HideInteract();
-                    actManager.actLevelSD.Save(3, 1);
-                }
-            }
-
-            if (actManager.actLevel.task == 1)
-            {
-                if (Input.GetKeyDown(KeyCode.Space) && isBarDoorHere)
-                {
-                    gameManager.StartVisible("ValleyLily");
-                }
-            }
-        }
-
-        if (actManager.actLevel.act == 4)
-        {
-            if (actManager.actLevel.task == 0)
-            {
-            }
-        }
-
-        // if (Input.GetKeyDown(KeyCode.P))
-        // {
-        //     actManager.actLevelSD.Save(0, 4);
-        //     PlayerPrefs.SetInt("Phone", 2);
-        // }
-        //
-        // if (Input.GetKeyDown(KeyCode.K))
-        // {
-        //     actManager.actLevelSD.Save(0, 0);
-        // }
     }
 
 
+    //calling to Janna 
     public IEnumerator Calling()
     {
         AudioManager.GetInstance().audioSource.PlayOneShot(AudioManager.GetInstance().phoneRotate);
@@ -454,7 +448,7 @@ public class PlayerController : MonoBehaviour
             gameManager.ShowInteract();
         }
 
-        if (col.tag == "BarDoor" && PlayerPrefs.GetInt("Richard")==1)
+        if (col.tag == "BarDoor" && PlayerPrefs.GetInt("Richard") == 1)
         {
             isBarDoorHere = true;
             gameManager.ShowDoorOpen();
@@ -569,7 +563,7 @@ public class PlayerController : MonoBehaviour
             gameManager.HideInteract();
         }
 
-        if (col.tag == "BarDoor" && PlayerPrefs.GetInt("Richard")==1)
+        if (col.tag == "BarDoor" && PlayerPrefs.GetInt("Richard") == 1)
         {
             isBarDoorHere = false;
             gameManager.HideDoorOpen();

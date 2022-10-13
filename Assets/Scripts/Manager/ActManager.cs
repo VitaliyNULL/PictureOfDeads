@@ -46,6 +46,7 @@ public class ActManager : MonoBehaviour
     {
         
         UpdateData();
+        //Updating hint
         if (actLevel.act == 0)
         {
             text.text = actTask.firstAct[actLevel.task];
